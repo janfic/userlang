@@ -18,4 +18,4 @@ The translator will be written in Groovy, a dynamic multi-faceted language, that
 Documentation
 -----------------------------------
 
-Documentation of USER will be written in the WIKI, for easy access and organization.
+Documentation of USER will be written in the [WIKI](https://github.com/janfic/ISP2019/wiki), for easy access and organization.
