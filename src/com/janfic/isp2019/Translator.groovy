@@ -22,6 +22,7 @@ class Translator {
     
     public static void setFile( File f ) {
         file = f
+        translation.name = file.name.substring(0, file.name.lastIndexOf('.'))
     }
     
     public static void addImport(String alias, String name) {
@@ -29,6 +30,7 @@ class Translator {
     }
     
     public static void compile() {
+        makeBinding()
         loader = new GroovyClassLoader(new GroovyClassLoader(), config) //ugh
         shell = new GroovyShell(loader, binding, config)
         shell.evaluate(file)
@@ -36,6 +38,13 @@ class Translator {
     
     public static void makeBinding() {
         binding = new Binding()
+        binding."${translation.name}" = { Closure c -> 
+            c()
+            c
+        }
+        binding.component = {
+            translation.type = "Component"
+        }
     }
     
     public static Map getTranslation() {

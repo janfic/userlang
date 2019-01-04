@@ -6,25 +6,35 @@ class Writer {
    
     public static void setFile(File f) {
         file = f
-        output = new PrintStream(f)
+        output = new PrintStream(new File(f.name.replace(".txt",".groovy")))
     }
     
-    public static void writeComponent(String name, String pack, Map variables) {
+    public static void write(Map translation) {
+        if(translation.type.equals("Component")) {
+            writeComponent(translation)
+        }
+    }
+    
+    public static void writeComponent(Map translation) {
+        output.println "import com.badlogic.ashley.core.Component;"
+        output.println ""
+        output.println "public class $translation.name implements Component {"
+        output.println "\t"
+        output.print "}"
+    }
+    public static void writeEntity(Map translation) {
         
     }
-    public static void writeEntity(String name, String pack, Map components) {
+    public static void writeSystem(Map translation) {
         
     }
-    public static void writeSystem(String name, String pack, String[] family) {
+    public static void writePack(Map translation) {
         
     }
-    public static void writePack(String name, String info, String displayName, String author, String[] components, String[] entities, String[] systems, String[] assets, String[] activeSystems ) {
+    public static void writeAsset(Map translation) {
         
     }
-    public static void writeAsset(String name, String pack, String type, Closure script) {
-        
-    }
-    public static void writeScript(String name) { //function
+    public static void writeScript(Map translation) { //function
         
     }
 }

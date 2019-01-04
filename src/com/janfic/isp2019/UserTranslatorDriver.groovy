@@ -22,7 +22,7 @@ class UserTranslatorDriver {
                             files.add(file)
                         }
                         else{
-                            println "Could not find file " + file.n
+                            println "Could not find file " + file.name
                         }
                         println "Current compile list: $files"
                         true
@@ -34,5 +34,25 @@ class UserTranslatorDriver {
             println "Translating the files:"
             files.each({println it})
         }
+        else {
+            def file = new File(args[0])
+            if(file.exists()) {
+                files.add(file)
+            }
+            else {
+                println "Cannot not find file " + file.name
+                return
+            }
+        }
+        files.each({
+                println "Compiling  $it.name.."
+                Writer.setFile(it)
+                Translator.setFile(it)
+                Translator.compile()
+                println "..Completed compilation"
+                println "Translating.."
+                Writer.write(Translator.getTranslation())
+                println "..translation found in $it.name"
+            })
     }
 }
