@@ -38,12 +38,18 @@ class Translator {
     
     public static void makeBinding() {
         binding = new Binding()
-        binding."${translation.name}" = { Closure c -> 
-            c()
-            c
+        binding."${translation.name}" = { Closure body -> 
+            body.fields = { Map map ->
+                translation.fields = map
+            }
+            body()
+            return body
         }
         binding.component = {
             translation.type = "Component"
+        }
+        binding.pack = { String p ->
+            translation.pack = p
         }
     }
     
