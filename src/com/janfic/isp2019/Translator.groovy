@@ -42,6 +42,9 @@ class Translator {
             body.fields = { Map map ->
                 translation.fields = map
             }
+            body.defaults = { Map map ->
+                translation.defaults = map
+            }
             body()
             return body
         }
