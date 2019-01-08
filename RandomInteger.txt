@@ -1,0 +1,5 @@
+pack "core"
+script RandomInteger {
+	given min:int, max:int
+	run "min + max"
+}

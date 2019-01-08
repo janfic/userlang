@@ -1,0 +1,8 @@
+script MovementScript {
+	given x:int, vx:int, y:int, vy:int
+	run
+	"""
+		x = x + vx
+		y = y + vy
+	"""
+}

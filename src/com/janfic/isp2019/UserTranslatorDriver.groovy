@@ -13,7 +13,6 @@ class UserTranslatorDriver {
      **/
     static void main(String[] args) {
         files = []
-        println new RandomInteger([min:3, max: 10])()
         if(!args) {
             println "Enter file names which to translate then type 'end':"
             userInput = new Scanner(System.in)

@@ -13,6 +13,6 @@ class TestComponent implements Component {
 	TestComponent() {
 		x = 0
 		y = 0
-		z = new RandomInteger([min:0, max:10])()
+		z = new MovementScript(x:0, vx:12, y:0, vy:13)()
 	}
 }

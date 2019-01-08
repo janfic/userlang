@@ -19,6 +19,9 @@ class Writer {
         if(translation.type.equals("Component")) {
             writeComponent(translation)
         }
+        else if(translation.type.equals("Script")) {
+            writeScript(translation)
+        }
     }
     
     public static void writeComponent(Map translation) {
@@ -35,7 +38,7 @@ class Writer {
         output.println "\t$translation.name() {"
         translation.defaults.each({
                 if(it.value instanceof Map) {
-                    output.println "\t\t$it.key = new $it.value.script(${it.value - [script:it.value.script]})()"
+                    output.println "\t\t$it.key = new $it.value.script(${it.value - [script:it.value.script]})()".replace("[","").replace("]","")
                 }
                 else {
                     output.println "\t\t$it.key = $it.value"
@@ -58,6 +61,19 @@ class Writer {
         
     }
     public static void writeScript(Map translation) { //function
-        
+        output.println "package pack.${translation.pack}.scripts"
+        output.println ""
+        output.println "class $translation.name extends Closure {"
+        translation.given.each({output.println "\t$it.value $it.key"})
+        output.println ""
+        output.println "\t@Override"
+        output.println "\tdef call() {"
+        output.println "\t\t${translation.body}"
+        output.println "\t}"
+        output.println ""
+        output.println "\t${translation.name}() {"
+        output.println "\t\tsuper(null)"
+        output.println "\t}"
+        output.println "}"
     }
 }
