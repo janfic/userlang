@@ -8,9 +8,8 @@ class MovementScript extends Closure {
 
 	@Override
 	def call() {
-		
-	x = x + vx
-	y = y + vy
+		x = x + vx
+		y = y + vy
 	}
 
 	MovementScript() {

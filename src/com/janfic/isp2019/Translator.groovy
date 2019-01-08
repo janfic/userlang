@@ -17,6 +17,7 @@ class Translator {
     static {
         config = new CompilerConfiguration()
         imports = new ImportCustomizer()
+        binding = new Binding()
         config.addCompilationCustomizers(imports)
     }
     
@@ -39,7 +40,6 @@ class Translator {
     }
     
     public static void makeBinding() {
-        binding = new Binding()
         binding.script = {
             translation.type = "Script"
         }
@@ -51,8 +51,8 @@ class Translator {
                 translation.given = translation.fields = map
             }
             body.given = body.fields
-            body.run = {String b -> 
-                translation.body = b
+            body.run = {Closure b -> 
+                translation.body = extractScript()
             }
             body.defaults = { Map map ->
                 translation.defaults = map
@@ -64,6 +64,23 @@ class Translator {
         binding.pack = { String p ->
             translation.pack = p
         }
+    }
+    
+    public static String extractScript() {
+        String contents = file.text
+        int bracePairs = 0
+        int first = contents.indexOf("run {") + 4
+        int index = first
+        while(bracePairs >= 0) {
+            index++
+            if(contents.charAt(index) == '{') {
+                bracePairs++
+            }
+            else if(contents.charAt(index) == '}') {
+                bracePairs--
+            }
+        }
+        return contents.substring(first + 1, index).trim()
     }
     
     public static Map getTranslation() {

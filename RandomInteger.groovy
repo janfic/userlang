@@ -6,7 +6,7 @@ class RandomInteger extends Closure {
 
 	@Override
 	def call() {
-		min + max
+		return Math.random() * (max - min) + min
 	}
 
 	RandomInteger() {
