@@ -67,6 +67,11 @@ class Translator {
             translation.type = "Component"
         }
         
+        //creates the 'asset' keyword
+        binding.asset = {
+            translation.type = "Asset"
+        }
+        
         //creates a valid phrase for the name of the definition in USER
         binding."${translation.name}" = { Closure body -> 
             
@@ -83,7 +88,7 @@ class Translator {
                 translation.body = extractScript()
             }
             
-             //creates the 'defaults' keyword and its following required structure
+            //creates the 'defaults' keyword and its following required structure
             body.defaults = { Map map ->
                 translation.defaults = map
             }

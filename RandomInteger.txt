@@ -1,6 +1,7 @@
 pack "core"
 script RandomInteger {
 	given min:int, max:int
+	defaults min:0, max:10
 	run {
 		return Math.random() * (max - min) + min
 	}

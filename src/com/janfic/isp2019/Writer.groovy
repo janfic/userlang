@@ -4,7 +4,7 @@ package com.janfic.isp2019
  *  The transcriber of the Translator. Takes in translations and writes the translation into the current file 
  */
 class Writer {
-    
+       
     //Tools
     private static File file
     private static PrintStream output
@@ -30,8 +30,8 @@ class Writer {
     }
     
     /**
-    *  Writes a component defintion based on the translation given to it
-    */
+     *  Writes a component defintion based on the translation given to it
+     */
     public static void writeComponent(Map translation) {
         output.println "package pack.${translation.pack}.components" // package writing
         output.println ""
@@ -41,58 +41,51 @@ class Writer {
         output.println "import com.badlogic.ashley.core.Component" // import Component 
         output.println ""
         output.println "class $translation.name implements Component {" // start of class
-        translation.fields.each({output.println "\t$it.value $it.key"}) // var decs
+        writeFields(translation.fields)
         output.println ""
         output.println "\t$translation.name() {" // constructor
-        translation.defaults.each({ //setting vars to default
-                if(it.value instanceof Map) { // if a script/asset
-                    output.println "\t\t$it.key = new $it.value.script(${it.value - [script:it.value.script]})()".replace("[","").replace("]","") // write initializtion of script and run it
-                }
-                else {
-                    output.println "\t\t$it.key = $it.value"
-                }
-            })
+        writeDefaults(translation.defaults)
         output.println "\t}"
         
         output.print "}" // end class
     }
     
     /**
-    *   Writes an Entity Definition based on the translation given to it
-    */
+     *   Writes an Entity Definition based on the translation given to it
+     */
     public static void writeEntity(Map translation) {
         
     }
     
     /**
-    *   Writes a System Definition based on the translation given to it
-    */
+     *   Writes a System Definition based on the translation given to it
+     */
     public static void writeSystem(Map translation) {
         
     }
     
     /**
-    *   Writes a Pack Definition based on the translation given to it
-    */
+     *   Writes a Pack Definition based on the translation given to it
+     */
     public static void writePack(Map translation) {
         
     }
     
     /**
-    *   Writes a Asset Definition based on the translation given to it
-    */
+     *   Writes a Asset Definition based on the translation given to it
+     */
     public static void writeAsset(Map translation) {
-        
+
     }
     
     /**
-    *   Writes a Script Definition based on the translation given to it
-    */
+     *   Writes a Script Definition based on the translation given to it
+     */
     public static void writeScript(Map translation) {
         output.println "package pack.${translation.pack}.scripts" // writes package
         output.println ""
         output.println "class $translation.name extends Closure {" // start of class
-        translation.given.each({output.println "\t$it.value $it.key"}) // writes each var dec, the "given"
+        writeFields(translation.given)
         output.println ""
         output.println "\t@Override" //writes the "run" 
         output.println "\tdef call() {"
@@ -101,7 +94,50 @@ class Writer {
         output.println ""
         output.println "\t${translation.name}() {" // initializer
         output.println "\t\tsuper(null)"
+        writeDefaults(translation.defaults)
         output.println "\t}"
         output.println "}"
+    }
+    
+    /**
+     *  Writes field/given declarations 
+     */
+    public static void writeFields(Map fields) {
+        fields.each({output.println "\tprivate $it.value $it.key"})
+    }
+    
+    /**
+     *   Writes initializsers in the constructor. AKA the defaults of the definition
+     */
+    public static void writeDefaults(Map defaults) {
+        defaults.each({
+                output.print "\t\t$it.key = "
+                if(it.value instanceof Map) {
+                    writeSoACall(it.value)
+                }
+                else {
+                    output.println it.value
+                }
+            })
+    }
+    
+    /**
+     *   Writes a Script or Asset call
+     */ 
+    public static void writeSoACall(Map call) {
+        output.print "new "
+        if(call.script) {
+            output.print "$call.script("
+            output.print "${call - [script:call.script]}".replace("[","").replace("]","")
+            output.println ")()"
+        }
+        else if(call.asset) {
+            output.print "$call.asset"
+            output.print "${call - [asset:call.asset]}".replace("[","").replace("]","")
+            output.println ")()"
+        }
+        else {
+            println "NOT A VALID SCRIPT/ASSET CALL"
+        }
     }
 }

@@ -1,8 +1,8 @@
 package pack.core.scripts
 
 class RandomInteger extends Closure {
-	int min
-	int max
+	private int min
+	private int max
 
 	@Override
 	def call() {
@@ -11,5 +11,7 @@ class RandomInteger extends Closure {
 
 	RandomInteger() {
 		super(null)
+		min = 0
+		max = 10
 	}
 }
