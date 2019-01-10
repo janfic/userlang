@@ -57,10 +57,6 @@ class Translator {
     *   Sets up the current Binding, which is the main object in charge of the translation. Syntax, Structure, and Keywords are established here
     */
     public static void makeBinding() {
-        //creates the 'script' keyword
-        binding.script = {
-            translation.type = "Script"
-        }
         
         //creates the 'component' keyword
         binding.component = {

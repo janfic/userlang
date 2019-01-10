@@ -24,8 +24,8 @@ class Writer {
         if(translation.type.equals("Component")) {
             writeComponent(translation)
         }
-        else if(translation.type.equals("Script")) {
-            writeScript(translation)
+        else if(translation.type.equals("Asset")) {
+            writeAsset(translation)
         }
     }
     
@@ -72,17 +72,10 @@ class Writer {
     }
     
     /**
-     *   Writes a Asset Definition based on the translation given to it
-     */
-    public static void writeAsset(Map translation) {
-
-    }
-    
-    /**
      *   Writes a Script Definition based on the translation given to it
      */
-    public static void writeScript(Map translation) {
-        output.println "package pack.${translation.pack}.scripts" // writes package
+    public static void writeAsset(Map translation) {
+        output.println "package pack.${translation.pack}.assets" // writes package
         output.println ""
         output.println "class $translation.name extends Closure {" // start of class
         writeFields(translation.given)

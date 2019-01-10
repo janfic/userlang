@@ -1,15 +1,7 @@
 pack "core"
 asset PlayerSprite {
-	fields [ 
-		path	:	String,
-		width	:	int,
-		height	:	int
-	]
-	defaults [
-		path 	: 	"path/to/sprite.png", 
-		width 	: 	[ script : "Width" ],
-		height	:	128
-	]
+	fields path:String, width:int, height:int
+	defaults path:"path/to/sprite.png",width:[ script : "Width" ], height:128
 	run {
 		new Sprite( new Texture(path) , width , height )
 	}
