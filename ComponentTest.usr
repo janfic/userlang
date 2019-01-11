@@ -1,0 +1,9 @@
+pack "core"
+component ComponentTest {
+	fields 	x	:	int, 
+			y	:	Sprite, 
+			z	:	String
+	defaults 	x	:	0, 
+				y	:	[asset : "PlayerSprite"], 
+				z	:	"String"
+}

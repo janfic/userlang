@@ -14,7 +14,7 @@ class Writer {
      **/
     public static void setFile(File f) {
         file = f
-        output = new PrintStream(new File(f.name.replace(".txt",".groovy")))
+        output = new PrintStream(new File(f.name.substring(0, f.name.lastIndexOf(".")) + ".groovy"))
     }
     
     /**
@@ -27,6 +27,9 @@ class Writer {
         else if(translation.type.equals("Asset")) {
             writeAsset(translation)
         }
+        else if(translation.type.equals("Entity")) {
+            writeEntity(translation)
+        }
     }
     
     /**
@@ -35,10 +38,13 @@ class Writer {
     public static void writeComponent(Map translation) {
         output.println "package pack.${translation.pack}.components" // package writing
         output.println ""
-        output.println "import pack.${translation.pack}.scripts.*" // import in pack items
         output.println "import pack.${translation.pack}.assets.*"
         output.println ""
-        output.println "import com.badlogic.ashley.core.Component" // import Component 
+        output.println "import com.badlogic.ashley.core.*" // imports 
+        output.println "import com.badlogic.gdx.graphics.g2d.*"  
+        output.println "import com.badlogic.gdx.files.*"
+        output.println "import com.badlogic.gdx.math.*"
+        output.println "import com.badlogic.gdx.graphics.*" 
         output.println ""
         output.println "class $translation.name implements Component {" // start of class
         writeFields(translation.fields)
@@ -46,7 +52,6 @@ class Writer {
         output.println "\t$translation.name() {" // constructor
         writeDefaults(translation.defaults)
         output.println "\t}"
-        
         output.print "}" // end class
     }
     
@@ -54,8 +59,35 @@ class Writer {
      *   Writes an Entity Definition based on the translation given to it
      */
     public static void writeEntity(Map translation) {
-        
+        output.println "package pack.${translation.pack}.entities"
+        output.println ""
+        output.println "import pack.${translation.pack}.assets.*"
+        output.println "import pack.${translation.pack}.components.*"
+        output.println ""
+        output.println "import com.badlogic.ashley.core.Entity"
+        output.println ""
+        output.println "class $translation.name extends Closre<Entity> {"
+        output.println "\t@Override"
+        output.println "\tEntity call() {"
+        output.println "\t\tEntity entity = new Entity()"
+        writeComponents(translation.components, translation.defaults)
+        output.println "\t\treturn entity"
+        output.println "\t}"
+        output.println ""
+        output.println "\t$translation.name() {"
+        output.println "\t\tsuper(null)"
+        output.println "\t}"
+        output.println "}"
     }
+    
+    public static void writeComponents(String[] comps, Map defaults) {
+        comps.each({
+                output.print "\t\tentity.add(new $it("
+                output.print defaults[it.toString()]
+                output.println "))"
+            })
+    }
+        
     
     /**
      *   Writes a System Definition based on the translation given to it
@@ -77,6 +109,12 @@ class Writer {
     public static void writeAsset(Map translation) {
         output.println "package pack.${translation.pack}.assets" // writes package
         output.println ""
+        output.println "import com.badlogic.ashley.core.*" // imports 
+        output.println "import com.badlogic.gdx.graphics.g2d.*"  
+        output.println "import com.badlogic.gdx.files.*"
+        output.println "import com.badlogic.gdx.math.*"
+        output.println "import com.badlogic.gdx.graphics.*" 
+        output.println ""
         output.println "class $translation.name extends Closure {" // start of class
         writeFields(translation.given)
         output.println ""
@@ -96,7 +134,7 @@ class Writer {
      *  Writes field/given declarations 
      */
     public static void writeFields(Map fields) {
-        fields.each({output.println "\tprivate $it.value $it.key"})
+        fields.each({output.println "\t${it.value.getSimpleName()} $it.key"})
     }
     
     /**
@@ -106,10 +144,13 @@ class Writer {
         defaults.each({
                 output.print "\t\t$it.key = "
                 if(it.value instanceof Map) {
-                    writeSoACall(it.value)
+                    writeAssetCall(it.value)
                 }
                 else {
-                    output.println it.value
+                    if(it.value instanceof String)
+                    output.println "\"$it.value\""
+                    else
+                    output.println "$it.value"
                 }
             })
     }
@@ -117,20 +158,33 @@ class Writer {
     /**
      *   Writes a Script or Asset call
      */ 
-    public static void writeSoACall(Map call) {
+    public static void writeAssetCall(Map call) {
         output.print "new "
-        if(call.script) {
-            output.print "$call.script("
-            output.print "${call - [script:call.script]}".replace("[","").replace("]","")
-            output.println ")()"
-        }
-        else if(call.asset) {
-            output.print "$call.asset"
-            output.print "${call - [asset:call.asset]}".replace("[","").replace("]","")
+        if(call.asset) {
+            output.print "$call.asset("
+            if(call.size() > 1){
+                call = call - [asset:call.asset]
+                call.eachWithIndex({ k , v, index ->
+                        output.print "$k:"
+                        if(v instanceof String) {
+                            output.print "\"$v\""
+                        }
+                        else {
+                            output.print "$v"
+                        }
+                        if(index < call.size() - 1) {
+                            output.print " , "
+                        }
+                    })
+            }
             output.println ")()"
         }
         else {
             println "NOT A VALID SCRIPT/ASSET CALL"
         }
+    }
+    
+    public static void writeMap(Map map) {
+
     }
 }

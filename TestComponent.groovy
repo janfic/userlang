@@ -6,9 +6,9 @@ import pack.core.assets.*
 import com.badlogic.ashley.core.Component
 
 class TestComponent implements Component {
-	private int x
-	private int y
-	private int z
+	int x
+	int y
+	int z
 
 	TestComponent() {
 		x = 0

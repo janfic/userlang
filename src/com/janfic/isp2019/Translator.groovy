@@ -4,8 +4,8 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 
 /*
-*   Translates files of USER into Map objects that contain a translation into Groovy
-*/
+ *   Translates files of USER into Map objects that contain a translation into Groovy
+ */
 class Translator {
     
     //Tools
@@ -23,13 +23,14 @@ class Translator {
     static {
         config = new CompilerConfiguration()
         imports = new ImportCustomizer()
+        imports.addStarImports("com.badlogic.gdx.graphics.g2d","com.badlogic.gdx.files", "com.badlogic.gdx.math","com.badlogic.gdx.graphics")
         binding = new Binding()
         config.addCompilationCustomizers(imports)
     }
     
     /**
-    *   Set the current USER file to be translated. Also resets the translation
-    */
+     *   Set the current USER file to be translated. Also resets the translation
+     */
     public static void setFile( File f ) {
         file = f
         translation = [name:"",type:"", pack:""]
@@ -37,15 +38,8 @@ class Translator {
     }
     
     /**
-    *   Adds an import to the current imports.
-    */
-    public static void addImport(String alias, String name) {
-        imports.addImport(alias, name)
-    }
-    
-    /**
-    *   Compiles the current USER file
-    */
+     *   Compiles the current USER file
+     */
     public static void compile() {
         makeBinding()
         loader = new GroovyClassLoader(new GroovyClassLoader(), config) //ugh
@@ -54,8 +48,8 @@ class Translator {
     }
     
     /**
-    *   Sets up the current Binding, which is the main object in charge of the translation. Syntax, Structure, and Keywords are established here
-    */
+     *   Sets up the current Binding, which is the main object in charge of the translation. Syntax, Structure, and Keywords are established here
+     */
     public static void makeBinding() {
         
         //creates the 'component' keyword
@@ -66,6 +60,11 @@ class Translator {
         //creates the 'asset' keyword
         binding.asset = {
             translation.type = "Asset"
+        }
+        
+        //creats the 'entity' keyword
+        binding.entity = {
+            translation.type = "Entity"
         }
         
         //creates a valid phrase for the name of the definition in USER
@@ -89,6 +88,11 @@ class Translator {
                 translation.defaults = map
             }
             
+            //create the 'components' keyword and its following required structure
+            body.components = { String... comps ->
+                translation.components = comps
+            }            
+            
             //runs the body
             body()
             return body
@@ -101,8 +105,8 @@ class Translator {
     }
     
     /**
-    *   Extracts the runnable script from the file by extracting it from the String version of the file.
-    */
+     *   Extracts the runnable script from the file by extracting it from the String version of the file.
+     */
     public static String extractScript() {
         String contents = file.text
         int bracePairs = 0
@@ -121,8 +125,8 @@ class Translator {
     }
     
     /**
-    *   Returns the translation
-    */
+     *   Returns the translation
+     */
     public static Map getTranslation() {
         return translation
     }

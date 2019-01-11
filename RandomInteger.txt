@@ -1,5 +1,5 @@
 pack "core"
-script RandomInteger {
+asset RandomInteger {
 	given min:int, max:int
 	defaults min:0, max:10
 	run {

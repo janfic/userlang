@@ -1,6 +1,8 @@
 package com.janfic.isp2019
 
 import com.janfic.isp2019.tst.*
+import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.Entity
 
 class UserTranslatorDriver {
     
