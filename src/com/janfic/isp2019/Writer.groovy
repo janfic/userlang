@@ -83,7 +83,7 @@ class Writer {
     public static void writeComponents(String[] comps, Map defaults) {
         comps.each({
                 output.print "\t\tentity.add(new $it("
-                output.print defaults[it.toString()]
+                writeMap(defaults[it.toString()])
                 output.println "))"
             })
     }
@@ -164,20 +164,9 @@ class Writer {
             output.print "$call.asset("
             if(call.size() > 1){
                 call = call - [asset:call.asset]
-                call.eachWithIndex({ k , v, index ->
-                        output.print "$k:"
-                        if(v instanceof String) {
-                            output.print "\"$v\""
-                        }
-                        else {
-                            output.print "$v"
-                        }
-                        if(index < call.size() - 1) {
-                            output.print " , "
-                        }
-                    })
+                writeMap(call)
             }
-            output.println ")()"
+            output.print ")()"
         }
         else {
             println "NOT A VALID SCRIPT/ASSET CALL"
@@ -185,6 +174,22 @@ class Writer {
     }
     
     public static void writeMap(Map map) {
-
+        map.eachWithIndex({ key, value, index ->
+                
+                if(value instanceof Map) {
+                    output.print "$key:"
+                    writeMap(value)
+                }
+                else if(key.equals("asset")) {
+                    writeAssetCall([asset:value])
+                }
+                else if(value instanceof String ){
+                    output.print "$key:\"$value\""
+                }
+                else {
+                    output.print "$key:${value}"
+                }
+                output.print "${index < map.size() - 1 ? " , " : ""}"
+            })
     }
 }
