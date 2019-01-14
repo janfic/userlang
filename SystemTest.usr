@@ -4,6 +4,6 @@ system SystemTest {
 			velocity:"VelocityComponent"
 	run {
 		position.x += velocity.vx
-		position.y += velocity.vy
+		position = [	asset	:	"Asset"	, field:"Hello", field2:[asset:"Asset"]]
 	}
 }

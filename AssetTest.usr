@@ -3,6 +3,6 @@ asset AssetTest {
 	given name:String
 	defaults name:"Sprite.png"
 	run {
-		return new Sprite(name)
+		return [asset : "AssetTest"]
 	}
 }

@@ -8,6 +8,7 @@ class Writer {
     //Tools
     private static File file
     private static PrintStream output
+    private static GroovyShell shell
    
     /**
      *   Sets the writer's file. This creates also creates the new output file. *.groovy
@@ -15,6 +16,7 @@ class Writer {
     public static void setFile(File f) {
         file = f
         output = new PrintStream(new File(f.name.substring(0, f.name.lastIndexOf(".")) + ".groovy"))
+        shell = new GroovyShell()
     }
     
     /**
@@ -128,10 +130,27 @@ class Writer {
         output.println "\t\tfor(entity in entities) {"
         (translation.family as Map).each({output.println "\t\t\t${it.value} $it.key = ${it.value.toString().toLowerCase()}Mapper.get(entity)"})
         output.println "" 
-        output.println "\t\t\t${translation.body.replaceAll("\\n\\t*","\n\t\t\t")}"
+        writeBody(translation.body)
         output.println "\t\t}"
         output.println "\t}"
         output.println "}"
+    }
+    
+    /**
+     *  Writes a Body of a System or Asset. Replaces all asset calls with translation 
+     */
+    public static void writeBody(String body) {
+        output.print "\t\t\t"
+        body = body.replaceAll("\\n\\t*","\n\t\t\t")
+        def assetCalls = body.findAll("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
+        def parts = body.split("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
+        parts.eachWithIndex({ str, index ->
+                output.print str
+                writeAssetCall((Map)shell.evaluate(assetCalls.get(index)))
+            })
+        output.println ""
+        //output.println "\t\t\t${body.replaceAll("\\n\\t*","\n\t\t\t")}"
+        
     }
     
     /**
@@ -158,7 +177,7 @@ class Writer {
         output.println ""
         output.println "\t@Override" //writes the "run" 
         output.println "\tdef call() {"
-        output.println "\t\t${translation.body}"
+        writeBody(translation.body)
         output.println "\t}"
         output.println ""
         output.println "\t${translation.name}() {" // initializer
@@ -197,7 +216,7 @@ class Writer {
     /**
      *   Writes a Script or Asset call
      */ 
-    public static void writeAssetCall(Map call) {
+    public static String writeAssetCall(Map call) {
         output.print "new "
         if(call.asset) {
             output.print "$call.asset("

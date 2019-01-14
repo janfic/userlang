@@ -26,7 +26,7 @@ class SystemTest extends EntitySytem {
 			VelocityComponent velocity = velocitycomponentMapper.get(entity)
 
 			position.x += velocity.vx
-			position.y += velocity.vy
+			position = new Asset(field:"Hello" , field2:new Asset()())()
 		}
 	}
 }

@@ -11,7 +11,7 @@ class AssetTest extends Closure {
 
 	@Override
 	def call() {
-		return new Sprite(name)
+			return new AssetTest()()
 	}
 
 	AssetTest() {
