@@ -4,6 +4,6 @@ component ComponentTest {
 			y	:	Sprite, 
 			z	:	String
 	defaults 	x	:	0, 
-				y	:	[asset : "PlayerSprite"], 
+				y	:	[asset : "AssetTest"]
 				z	:	"String"
 }

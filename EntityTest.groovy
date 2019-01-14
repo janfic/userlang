@@ -11,7 +11,7 @@ class EntityTest extends Closre<Entity> {
 		Entity entity = new Entity()
 		entity.add(new PositionComponent(x:0 , y:0))
 		entity.add(new VelocityComponent(vx:0 , vy:0))
-		entity.add(new SpriteComponent(sprite:new PlayerSprite()() , path:"dhsidsi.dsds}"))
+		entity.add(new SpriteComponent(sprite:new PlayerSprite(path:"Path/ds/ds.dsd")()))
 		return entity
 	}
 

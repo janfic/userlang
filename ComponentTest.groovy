@@ -15,7 +15,7 @@ class ComponentTest implements Component {
 
 	ComponentTest() {
 		x = 0
-		y = new PlayerSprite()()
+		y = new First(field:new Second(field:"Field" , test:"Test")())()
 		z = "String"
 	}
 }

@@ -145,6 +145,7 @@ class Writer {
                 output.print "\t\t$it.key = "
                 if(it.value instanceof Map) {
                     writeAssetCall(it.value)
+                    output.println()
                 }
                 else {
                     if(it.value instanceof String)
@@ -174,22 +175,24 @@ class Writer {
     }
     
     public static void writeMap(Map map) {
-        map.eachWithIndex({ key, value, index ->
-                
-                if(value instanceof Map) {
-                    output.print "$key:"
-                    writeMap(value)
-                }
-                else if(key.equals("asset")) {
-                    writeAssetCall([asset:value])
-                }
-                else if(value instanceof String ){
-                    output.print "$key:\"$value\""
-                }
-                else {
-                    output.print "$key:${value}"
-                }
-                output.print "${index < map.size() - 1 ? " , " : ""}"
-            })
+        int index = 0
+        for( e in map) {
+            if(e.key.equals("asset")) {
+                writeAssetCall(map)
+                break
+            }
+            else if(e.value instanceof Map) {
+                output.print "$e.key:"
+                writeMap(e.value)
+            }
+            else if(e.value instanceof String ){
+                output.print "$e.key:\"$e.value\""
+            }
+            else {
+                output.print "$e.key:${e.value}"
+            }
+            output.print "${index < map.size() - 1 ? " , " : ""}"
+            index++
+        }
     }
 }
