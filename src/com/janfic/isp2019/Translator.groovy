@@ -67,6 +67,11 @@ class Translator {
             translation.type = "Entity"
         }
         
+        //creates the 'system' keyword
+        binding.system = {
+            translation.type = "System"
+        }
+        
         //creates a valid phrase for the name of the definition in USER
         binding."${translation.name}" = { Closure body -> 
             
@@ -92,6 +97,10 @@ class Translator {
             body.components = { String... comps ->
                 translation.components = comps
             }            
+            
+            body.family = { Map map ->
+                translation.family = map
+            }
             
             //runs the body
             body()

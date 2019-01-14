@@ -5,5 +5,5 @@ entity EntityTest {
 				"SpriteComponent"
 	defaults 	PositionComponent	:	[x	:	0 , y	:	0], 
 				VelocityComponent	:	[vx	:	0, vy	:	0], 
-				SpriteComponent		:	[sprite	:	[asset	:	"PlayerSprite", path:"Path/ds/ds.dsd"]]
+				SpriteComponent		:	[sprite	:	[asset	:	"PlayerSprite", path:"path/to/sprite.png"]]
 }

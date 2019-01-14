@@ -30,6 +30,9 @@ class Writer {
         else if(translation.type.equals("Entity")) {
             writeEntity(translation)
         }
+        else if(translation.type.equals("System")) {
+            writeSystem(translation)
+        }
     }
     
     /**
@@ -93,7 +96,42 @@ class Writer {
      *   Writes a System Definition based on the translation given to it
      */
     public static void writeSystem(Map translation) {
-        
+        output.println "package pack.${translation.pack}.systems"
+        output.println ""
+        output.println "import pack.${translation.pack}.components"
+        output.println "import pack.${translation.pack}.assets"
+        output.println ""
+        output.println "import com.badlogic.ashley.core.*"
+        output.println ""
+        output.println "class $translation.name extends EntitySytem {"
+        output.println "\tprivate ImmutableArray<Entity> entities"
+        output.println ""
+        translation.family.each({output.println "\tprivate ComponentMapper<$it.value> ${it.value.toString().toLowerCase()}Mapper = ComponentMapper.getFor(${it.value}.class)"})
+        output.println ""
+        output.println "\tvoid addedToEngine(Engine engine) {"
+        output.println "\t\tentities = engine.getFor("
+        output.println "\t\t\tFamily.all("
+        (translation.family as Map).eachWithIndex({ key, value, index ->
+                output.print "\t\t\t\t${value}.class"
+                if(index < translation.family.size() - 1) {
+                    output.println ","
+                }
+                else {
+                    output.println ""
+                }
+            })
+        output.println "\t\t\t).get()"
+        output.println "\t\t)"
+        output.println "\t}"
+        output.println ""
+        output.println "\tvoid update(float deltaTime) {"
+        output.println "\t\tfor(entity in entities) {"
+        (translation.family as Map).each({output.println "\t\t\t${it.value} $it.key = ${it.value.toString().toLowerCase()}Mapper.get(entity)"})
+        output.println "" 
+        output.println "\t\t\t${translation.body.replaceAll("\\n\\t*","\n\t\t\t")}"
+        output.println "\t\t}"
+        output.println "\t}"
+        output.println "}"
     }
     
     /**

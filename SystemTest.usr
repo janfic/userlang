@@ -1,0 +1,9 @@
+pack "core"
+system SystemTest {
+	family 	position:"PositionComponent",
+			velocity:"VelocityComponent"
+	run {
+		position.x += velocity.vx
+		position.y += velocity.vy
+	}
+}
