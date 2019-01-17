@@ -23,7 +23,13 @@ class Translator {
     static {
         config = new CompilerConfiguration()
         imports = new ImportCustomizer()
-        imports.addStarImports("com.badlogic.gdx.graphics.g2d","com.badlogic.gdx.files", "com.badlogic.gdx.math","com.badlogic.gdx.graphics")
+        imports.addStarImports("com.badlogic.gdx.graphics.g2d",
+                                "com.badlogic.gdx.files", 
+                                "com.badlogic.gdx.math",
+                                "com.badlogic.gdx.graphics",
+                                "com.badlogic.gdx.graphics.glutils",
+                                "com.badlogic.gdx"
+        )
         binding = new Binding()
         config.addCompilationCustomizers(imports)
     }
@@ -74,6 +80,7 @@ class Translator {
         
         //creates a valid phrase for the name of the definition in USER
         binding."${translation.name}" = { Closure body -> 
+            translation.eachEntity = [:]
             
             // creates the 'fields' keyword and its structure
             body.fields = { Map map ->
@@ -85,7 +92,7 @@ class Translator {
             
             //creates the 'run' keyword and its following required structure
             body.run = {Closure b -> 
-                translation.body = extractScript()
+                translation.body = extractScript("(?s)run\\s*\\{.*\\}")
             }
             
             //creates the 'defaults' keyword and its following required structure
@@ -99,7 +106,24 @@ class Translator {
             }            
             
             body.family = { Map map ->
-                translation.family = map
+                translation.families = [entities:map]
+            }
+            
+            body.families = { Map map ->
+                translation.families = map
+            }
+            
+            body.eachEntity =  {Map map ->
+                for(f in map)
+                translation.eachEntity."$f.key" = extractScript("(?s)eachEntity\\s*$f.key\\s*:\\s*\\{.*\\}").trim()
+            }
+            
+            body.eachFrame = {Closure c ->
+                translation.eachFrame = extractScript("(?s)eachFrame\\s*\\{.*\\}").trim()
+            }
+            
+            body.endFrame = {Closure c ->
+                translation.endFrame = extractScript("(?s)endFrame\\s*\\{.*\\}").trim()
             }
             
             //runs the body
@@ -116,21 +140,25 @@ class Translator {
     /**
      *   Extracts the runnable script from the file by extracting it from the String version of the file.
      */
-    public static String extractScript() {
+    public static String extractScript(String regex) {
         String contents = file.text
-        int bracePairs = 0
-        int first = contents.indexOf("run {") + 4
-        int index = first
-        while(bracePairs >= 0) {
-            index++
-            if(contents.charAt(index) == '{') {
-                bracePairs++
+        String r = contents.find(regex)
+        r = r.substring(r.indexOf("{") + 1, r.lastIndexOf("}") - 1)
+        int index = 0
+        int count = 0
+        for(int i = 0; i<r.length(); i++) {
+            if(r.charAt(i) == '{') {
+                count++
             }
-            else if(contents.charAt(index) == '}') {
-                bracePairs--
+            else if(r.charAt(i) == '}') {
+                count--
             }
+            if(count<0) {
+                break
+            }
+            index = i
         }
-        return contents.substring(first + 1, index).trim()
+        r.substring(0,index)
     }
     
     /**

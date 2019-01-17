@@ -1,0 +1,12 @@
+pack "agar"
+system FollowMouseSystem {
+	family 	position:"PositionComponent",
+			velocity:"VelocityComponent",
+			follow:"FollowMouseComponent"
+	eachFrame {
+		float mx = Gdx.input.getX()
+		float my = Gdx.input.getY()
+		velocity.vx = (mx - position.x) / (my - position.y + mx - position.x)
+		velocity.vx = (my - position.y) / (my - position.y + mx - position.x)
+	}
+}

@@ -9,9 +9,9 @@ class EntityTest extends Closre<Entity> {
 	@Override
 	Entity call() {
 		Entity entity = new Entity()
-		entity.add(new PositionComponent(x:0 , y:0))
+		entity.add(new PositionComponent())
 		entity.add(new VelocityComponent(vx:0 , vy:0))
-		entity.add(new SpriteComponent(sprite:new PlayerSprite(path:"Path/ds/ds.dsd")()))
+		entity.add(new SpriteComponent(sprite:new PlayerSprite(path:"path/to/sprite.png")()))
 		return entity
 	}
 

@@ -1,0 +1,9 @@
+pack "agar"
+system MovementSystem {
+	family 	position:"PositionComponent",
+			velocity:"VelocityComponent"
+	eachEntity entities:{
+		position.x += velocity.vx
+		position.y += velocity.vy
+	}
+}

@@ -1,0 +1,4 @@
+pack "core"
+component FollowMouseComponent {
+
+}

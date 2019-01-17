@@ -1,5 +1,0 @@
-pack "core"
-component TestComponent {
-	fields  x:int, y:int, z:int
-	defaults x:0, y:0, z:[ script:"MovementScript" , x:0, vx: 12, y:0, vy:13]
-}

@@ -1,0 +1,7 @@
+pack "core"
+component PositionComponent {
+	fields 	x:int, 
+			y:int
+	defaults 	x	:	[asset : "RandomInteger", min:0, max:640], 
+				y	:	[asset : "RandomInteger", min:0, max:480]
+}

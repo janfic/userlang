@@ -1,0 +1,7 @@
+pack "agar"
+entity PelletEntity {
+	components 	"MassComponent",
+				"CircleComponent",
+				"PositionComponent"
+	defaults MassComponent:[mass:4]
+}

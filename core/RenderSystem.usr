@@ -1,0 +1,19 @@
+pack "agar"
+system RenderSystem {
+	fields sr:ShapeRenderer
+	defaults sr:[make : ShapeRenderer]
+	family 	position:"PositionComponent",
+			circle:"CircleComponent"
+	
+	eachFrame {
+		sr.begin(ShapeRenderer.ShapeType.Line)
+	}
+	
+	eachEntity entities:{
+		sr.circle(position.x, position.y, circle.radius)
+	}
+	
+	endFrame {
+		sr.end()
+	}
+}

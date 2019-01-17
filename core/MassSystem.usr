@@ -1,0 +1,11 @@
+pack "agar"
+system MassSystem {
+	family 	mass:"MassComponent", 
+			circle:"CircleComponent"
+	eachEntity entities:{
+		circle.radius = sqrt(mass.mass/Math.PI)
+		if(mass.mass <= 0) {
+			entity.remove(MassComponent.class)
+		}
+	}
+}

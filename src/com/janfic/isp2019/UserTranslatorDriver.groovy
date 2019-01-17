@@ -48,14 +48,28 @@ class UserTranslatorDriver {
             }
         }
         files.each({
-                println "Compiling  $it.name.."
-                Writer.setFile(it)
-                Translator.setFile(it)
-                Translator.compile()
-                println "..Completed compilation"
-                println "Translating.."
-                Writer.write(Translator.getTranslation())
-                println "..translation found in $it.name"
-            })
+                println compileFile(it)
+        })
+    }
+    
+    static void compileFile(File file) {
+        if(file.isDirectory()) {
+            for(f in file.listFiles(new USRFileFilter())) {
+                compileFile(f)
+            }
+        }
+        else {
+            Writer.setFile(file)
+            Translator.setFile(file)
+            Translator.compile()
+            Writer.write(Translator.getTranslation())
+        }
+    }
+    
+    static class USRFileFilter implements FileFilter {
+        @Override
+        boolean accept(File file) {
+            return file.name.endsWith(".usr") || !file.name.contains(".")
+        }
     }
 }

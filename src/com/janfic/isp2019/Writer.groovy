@@ -15,7 +15,11 @@ class Writer {
      **/
     public static void setFile(File f) {
         file = f
-        output = new PrintStream(new File(f.name.substring(0, f.name.lastIndexOf(".")) + ".groovy"))
+        
+        File newFile = new File(f.getParentFile(), "groovy/" + f.getName().replace(".usr",".groovy"))
+        newFile.getParentFile().mkdirs()
+        newFile.createNewFile()
+        output = new PrintStream(newFile)
         shell = new GroovyShell()
     }
     
@@ -71,7 +75,7 @@ class Writer {
         output.println ""
         output.println "import com.badlogic.ashley.core.Entity"
         output.println ""
-        output.println "class $translation.name extends Closre<Entity> {"
+        output.println "class $translation.name extends Closure<Entity> {"
         output.println "\t@Override"
         output.println "\tEntity call() {"
         output.println "\t\tEntity entity = new Entity()"
@@ -85,14 +89,18 @@ class Writer {
         output.println "}"
     }
     
-    public static void writeComponents(String[] comps, Map defaults) {
+    public static void writeComponents(String[] comps, Map defaults = [:]) {
         comps.each({
                 output.print "\t\tentity.add(new $it("
-                writeMap(defaults[it.toString()])
+                if(defaults) {
+                    Map d = defaults[it.toString()]
+                    if(d!=null) {
+                        writeMap(d)
+                    }
+                }
                 output.println "))"
             })
     }
-        
     
     /**
      *   Writes a System Definition based on the translation given to it
@@ -100,57 +108,88 @@ class Writer {
     public static void writeSystem(Map translation) {
         output.println "package pack.${translation.pack}.systems"
         output.println ""
-        output.println "import pack.${translation.pack}.components"
-        output.println "import pack.${translation.pack}.assets"
+        output.println "import pack.${translation.pack}.components.*"
+        output.println "import pack.${translation.pack}.assets.*"
         output.println ""
         output.println "import com.badlogic.ashley.core.*"
+        output.println "import com.badlogic.gdx.graphics.g2d.*"  
+        output.println "import com.badlogic.gdx.files.*"
+        output.println "import com.badlogic.gdx.math.*"
+        output.println "import com.badlogic.gdx.graphics.*" 
+        output.println "import com.badlogic.gdx.graphics.glutil.*" 
         output.println ""
         output.println "class $translation.name extends EntitySytem {"
-        output.println "\tprivate ImmutableArray<Entity> entities"
+        for(family in (translation.families as Map)) {
+            output.println "\tprivate ImmutableArray<Entity> $family.key"
+        }
         output.println ""
-        translation.family.each({output.println "\tprivate ComponentMapper<$it.value> ${it.value.toString().toLowerCase()}Mapper = ComponentMapper.getFor(${it.value}.class)"})
+        //
+        List components = []
+        translation.families.each({
+                components += it.value.collect({key, value -> value})
+            })
+        components.unique({a , b -> a <=> b})
+        println components
+        components.each({output.println "\tprivate ComponentMapper<$it> ${it.toLowerCase()}Mapper = ComponentMapper.getFor(${it}.class)"})
+        //
+        output.println ""
+        writeFields(translation.fields)
+        output.println ""
+        output.println "\t$translation.name() {"
+        writeDefaults(translation.defaults)
+        output.println "\t}"
         output.println ""
         output.println "\tvoid addedToEngine(Engine engine) {"
-        output.println "\t\tentities = engine.getFor("
-        output.println "\t\t\tFamily.all("
-        (translation.family as Map).eachWithIndex({ key, value, index ->
-                output.print "\t\t\t\t${value}.class"
-                if(index < translation.family.size() - 1) {
-                    output.println ","
-                }
-                else {
-                    output.println ""
-                }
-            })
-        output.println "\t\t\t).get()"
-        output.println "\t\t)"
+        for(family in (translation.families as Map)) {
+            output.println "\t\t$family.key = engine.getFor("
+            output.println "\t\t\tFamily.all("
+            (family.value as Map).eachWithIndex({ key, value, index ->
+                    output.print "\t\t\t\t${value}.class"
+                    if(index < family.value.size() - 1) {
+                        output.println ","
+                    }
+                    else {
+                        output.println ""
+                    }
+                })
+            output.println "\t\t\t).get()"
+            output.println "\t\t)"
+        }
         output.println "\t}"
         output.println ""
         output.println "\tvoid update(float deltaTime) {"
-        output.println "\t\tfor(entity in entities) {"
-        (translation.family as Map).each({output.println "\t\t\t${it.value} $it.key = ${it.value.toString().toLowerCase()}Mapper.get(entity)"})
-        output.println "" 
-        writeBody(translation.body)
-        output.println "\t\t}"
+        if(translation.eachFrame)
+        output.println "\t\t$translation.eachFrame"
+        for(family in translation.eachEntity) {
+            output.println "\t\tfor( entity in $family.key) {"
+            for(c in translation.families."$family.key") {
+                output.println "\t\t\t$c.value $c.key = ${c.value.toLowerCase()}Mapper.get(entity)"
+            }
+            output.println "\t\t\t$family.value"
+            output.println "\t\t}"
+        }
+        if(translation.endFrame)
+        output.println "\t\t$translation.endFrame"
         output.println "\t}"
         output.println "}"
     }
     
-    /**
+    /**  
      *  Writes a Body of a System or Asset. Replaces all asset calls with translation 
      */
     public static void writeBody(String body) {
         output.print "\t\t\t"
-        body = body.replaceAll("\\n\\t*","\n\t\t\t")
         def assetCalls = body.findAll("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
         def parts = body.split("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
+        if(assetCalls.size() > 0)
         parts.eachWithIndex({ str, index ->
                 output.print str
                 writeAssetCall((Map)shell.evaluate(assetCalls.get(index)))
             })
+        else 
+        output.println body
         output.println ""
         //output.println "\t\t\t${body.replaceAll("\\n\\t*","\n\t\t\t")}"
-        
     }
     
     /**
@@ -226,8 +265,13 @@ class Writer {
             }
             output.print ")()"
         }
-        else {
-            println "NOT A VALID SCRIPT/ASSET CALL"
+        else if(call.make) {
+            output.print "${call.make.getSimpleName()}("
+            if(call.size() > 1){
+                call = call - [make:call.make]
+                writeMap(call)
+            }
+            output.print ")"
         }
     }
     

@@ -1,0 +1,5 @@
+pack "agar"
+component MassComponent {
+	fields mass:int
+	defaults mass:12
+}

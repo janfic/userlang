@@ -1,0 +1,8 @@
+pack "agar"
+entity AgarEntity {
+	components	"PositionComponent",
+				"VelocityComponent",
+				"MassComponent",
+				"CircleComponent",
+				"FollowMouseComponent"
+}

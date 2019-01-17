@@ -1,7 +1,7 @@
 package pack.core.systems
 
-import pack.core.components
-import pack.core.assets
+import pack.core.components.*
+import pack.core.assets.*
 
 import com.badlogic.ashley.core.*
 

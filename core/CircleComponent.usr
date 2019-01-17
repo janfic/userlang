@@ -1,0 +1,5 @@
+pack "agar"
+component CircleComponent {
+	fields radius:float
+	defaults radius:2f
+}

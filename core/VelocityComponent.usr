@@ -1,0 +1,5 @@
+pack "core"
+component VelocityComponent {
+	fields vx:int, vy:int
+	defaults vx:0, vy:0
+}

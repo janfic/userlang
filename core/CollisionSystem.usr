@@ -1,0 +1,6 @@
+pack "agar"
+system CollisionSystem {
+	families 	entities:[ mass:"MassComponent",
+						position:"PositionComponent",
+						circle:"CircleComponent"]
+}
