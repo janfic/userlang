@@ -1,0 +1,5 @@
+pack "agar"
+component NameComponent {
+	fields name:String
+	defaults name:"Pineapple"
+}

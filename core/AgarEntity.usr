@@ -4,5 +4,6 @@ entity AgarEntity {
 				"VelocityComponent",
 				"MassComponent",
 				"CircleComponent",
-				"FollowMouseComponent"
+				"FollowMouseComponent",
+				"NameComponent"
 }

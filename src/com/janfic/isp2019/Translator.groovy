@@ -78,6 +78,10 @@ class Translator {
             translation.type = "System"
         }
         
+        binding.uses = { String...packs ->
+            translation.uses = packs
+        }
+        
         //creates a valid phrase for the name of the definition in USER
         binding."${translation.name}" = { Closure body -> 
             translation.eachEntity = [:]
@@ -109,6 +113,8 @@ class Translator {
                 translation.families = [entities:map]
             }
             
+            
+            //system
             body.families = { Map map ->
                 translation.families = map
             }
@@ -126,14 +132,46 @@ class Translator {
                 translation.endFrame = extractScript("(?s)endFrame\\s*\\{.*\\}").trim()
             }
             
+            
+            //pack
+            body.author = { String author ->
+                translation.author = author
+            }
+            
+            body.info = { String info ->
+                translation.info = info
+            }
+            
+            body.display = { String display ->
+                translation.display = display
+            }
+            
+            body.assets = { String...assets ->
+                translation.systems = assets
+            }
+            
+            body.entities = { String...entities ->
+                translation.systems = entities
+            }
+            
+            body.systems = { String...systems ->
+                translation.systems = systems
+            }
+            
             //runs the body
             body()
             return body
         }
         
         //creates the 'pack' keyword and required input
-        binding.pack = { String p ->
-            translation.pack = p
+        binding.pack = { def p ->
+            if(p instanceof String) {
+                translation.pack = p
+            }
+            else if(p instanceof Closure ) {
+                translation.type = "Pack"
+                translation.pack = "${translation.name.toLowerCase()}"
+            }
         }
     }
     

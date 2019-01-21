@@ -38,6 +38,9 @@ class Writer {
         }
         else if(translation.type.equals("System")) {
             writeSystem(translation)
+        } 
+        else if(translation.type.equals("Pack")) {
+            writePack(translation)
         }
     }
     
@@ -73,7 +76,13 @@ class Writer {
         output.println "import pack.${translation.pack}.assets.*"
         output.println "import pack.${translation.pack}.components.*"
         output.println ""
-        output.println "import com.badlogic.ashley.core.Entity"
+        writeUses(translation.uses)
+        output.println ""
+        output.println "import com.badlogic.ashley.core.*" // imports 
+        output.println "import com.badlogic.gdx.graphics.g2d.*"  
+        output.println "import com.badlogic.gdx.files.*"
+        output.println "import com.badlogic.gdx.math.*"
+        output.println "import com.badlogic.gdx.graphics.*" 
         output.println ""
         output.println "class $translation.name extends Closure<Entity> {"
         output.println "\t@Override"
@@ -111,6 +120,8 @@ class Writer {
         output.println "import pack.${translation.pack}.components.*"
         output.println "import pack.${translation.pack}.assets.*"
         output.println ""
+        writeUses(translation.uses as String[])
+        output.println ""
         output.println "import com.badlogic.ashley.core.*"
         output.println "import com.badlogic.gdx.graphics.g2d.*"  
         output.println "import com.badlogic.gdx.files.*"
@@ -118,7 +129,7 @@ class Writer {
         output.println "import com.badlogic.gdx.graphics.*" 
         output.println "import com.badlogic.gdx.graphics.glutil.*" 
         output.println ""
-        output.println "class $translation.name extends EntitySytem {"
+        output.println "class $translation.name extends EntitySystem {"
         for(family in (translation.families as Map)) {
             output.println "\tprivate ImmutableArray<Entity> $family.key"
         }
@@ -196,7 +207,42 @@ class Writer {
      *   Writes a Pack Definition based on the translation given to it
      */
     public static void writePack(Map translation) {
-        
+        output.println "package pack.${translation.pack}"
+        output.println ""
+        output.println "class $translation.name extends Pack {"
+        output.println "\t$translation.name() {"
+        output.println "\t\tsuper("
+        output.println "\t\t\tname:\"$translation.name\","
+        output.println "\t\t\tdisplay:\"$translation.display\","
+        output.println "\t\t\tinfo:\"$translation.info\","
+        output.print "\t\t\tdependencies:["
+        translation.uses.eachWithIndex({ it , index ->
+                output.print "new pack.$it.$it()"
+                if(index < translation.uses.size() - 2) {
+                    output.print ","
+                }
+                output.print ""
+        })
+        output.println "],"
+        output.print "\t\t\tassets:["
+        if(translation.assets)
+        output.print "\"${translation.assets.join("\",\"")}\""
+        output.println "],"
+        output.print "\t\t\tcomponents:["
+        if(translation.components)
+        output.print "\"${translation.components.join("\",\"")}\""
+        output.println "],"
+        output.print "\t\t\tentities:["
+        if(translation.entities)
+        output.print "\"${translation.entities.join("\",\"")}\""
+        output.println "],"
+        output.print "\t\t\tsystems:["
+        if(translation.systems)
+        output.print "\"${translation.systems.join("\",\"")}\""
+        output.println "]"
+        output.println "\t\t)"
+        output.println "\t}"
+        output.println "}"
     }
     
     /**
@@ -295,5 +341,14 @@ class Writer {
             output.print "${index < map.size() - 1 ? " , " : ""}"
             index++
         }
+    }
+    
+    public static void writeUses(String[] uses) {
+        uses.each({
+                output.println "import pack.${it}.*"
+                output.println "import pack.${it}.assets.*"
+                output.println "import pack.${it}.components.*"
+                output.println "import pack.${it}.entities.*"
+        })
     }
 }

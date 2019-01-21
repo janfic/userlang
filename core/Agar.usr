@@ -1,0 +1,20 @@
+pack Agar {
+	
+	author "jan"
+	display "CORE"
+	info "A pack creating a clone of agar.io"
+	
+	uses "Core"
+	
+	components 	"MassComponent",
+				"NameComponent",
+				"CircleComponent",
+				"PopComponent"
+
+	entities	"AgarEntity",
+				"VirusEntity",
+				"PelletEntity"
+				
+	systems		"MassSystem",
+				"CollisionSystem"
+}

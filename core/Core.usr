@@ -1,0 +1,15 @@
+pack Core {
+
+	author 	"Jan"
+	display "CORE"
+	info	"The core engine of the game"
+
+	assets "RandomIntegerAsset"
+	
+	components 	"PositionComponent",
+				"VelocityComponent",
+				"FollowMouseComponent"
+	systems		"MovementSystem", 
+				"FollowMouseSystem", 
+				"RenderSystem"
+}
