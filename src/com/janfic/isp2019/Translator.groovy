@@ -158,6 +158,9 @@ class Translator {
                 translation.systems = systems
             }
             
+            body.active = { String...actoveSystems ->
+                translation.active = activeSystems
+            }
             //runs the body
             body()
             return body

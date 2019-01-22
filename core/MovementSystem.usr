@@ -1,4 +1,4 @@
-pack "agar"
+pack "Core"
 system MovementSystem {
 	family 	position:"PositionComponent",
 			velocity:"VelocityComponent"

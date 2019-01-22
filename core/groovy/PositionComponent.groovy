@@ -13,7 +13,7 @@ class PositionComponent implements Component {
 	int y
 
 	PositionComponent() {
-		x = new RandomInteger(min:0 , max:640)()
-		y = new RandomInteger(min:0 , max:480)()
+		x = new RandomInteger(min:0 , max:1000)()
+		y = 0
 	}
 }

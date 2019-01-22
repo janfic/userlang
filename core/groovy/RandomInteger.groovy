@@ -9,13 +9,12 @@ import com.badlogic.gdx.graphics.*
 class RandomInteger extends Closure {
 	int min
 	int max
+	Random rand
 
 	@Override
 	def call() {
 			
-		Random rand = new Random()
 		return rand.nextInt(max-min) + min
-
 
 	}
 
@@ -23,5 +22,6 @@ class RandomInteger extends Closure {
 		super(null)
 		min = 0
 		max = 10
+		rand = new Random()
 	}
 }

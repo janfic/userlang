@@ -12,6 +12,6 @@ class CircleComponent implements Component {
 	float radius
 
 	CircleComponent() {
-		radius = 2.0
+		radius = 2
 	}
 }

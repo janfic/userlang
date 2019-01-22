@@ -2,6 +2,8 @@ pack "agar"
 entity PelletEntity {
 	components 	"MassComponent",
 				"CircleComponent",
-				"PositionComponent"
-	defaults MassComponent:[mass:4]
+				"PositionComponent",
+				"ColorComponent"
+	defaults MassComponent:[mass:4],
+			 ColorComponent:[asset : "RandomColor"]
 }

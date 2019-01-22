@@ -170,13 +170,13 @@ class Writer {
         output.println ""
         output.println "\tvoid update(float deltaTime) {"
         if(translation.eachFrame)
-        output.println "\t\t$translation.eachFrame"
+        writeBody("\t\t$translation.eachFrame")
         for(family in translation.eachEntity) {
             output.println "\t\tfor( entity in $family.key) {"
             for(c in translation.families."$family.key") {
                 output.println "\t\t\t$c.value $c.key = ${c.value.toLowerCase()}Mapper.get(entity)"
             }
-            output.println "\t\t\t$family.value"
+            writeBody("\t\t\t$family.value")
             output.println "\t\t}"
         }
         if(translation.endFrame)
@@ -190,15 +190,18 @@ class Writer {
      */
     public static void writeBody(String body) {
         output.print "\t\t\t"
-        def assetCalls = body.findAll("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
-        def parts = body.split("\\[\\s*asset\\s*:\\s*\"[a-zA-Z]+\".*\\]")
-        if(assetCalls.size() > 0)
-        parts.eachWithIndex({ str, index ->
-                output.print str
-                writeAssetCall((Map)shell.evaluate(assetCalls.get(index)))
-            })
+        def assetCalls = body.findAll("\\[\\s*(asset|entity)\\s*:\\s*\"[a-zA-Z]+\".*\\]")
+        def parts = body.split("\\[\\s*(asset|entity)\\s*:\\s*\"[a-zA-Z]+\".*\\]")
+        if(assetCalls.size() > 0) {
+            println "here"
+            parts.eachWithIndex({ str, int index ->
+                    output.print str
+                    if(index<parts.size() - 1)
+                    writeAssetCall((Map)shell.evaluate(assetCalls.get(index)))
+                })
+        }
         else 
-        output.println body
+        output.print body
         output.println ""
         //output.println "\t\t\t${body.replaceAll("\\n\\t*","\n\t\t\t")}"
     }
@@ -222,7 +225,7 @@ class Writer {
                     output.print ","
                 }
                 output.print ""
-        })
+            })
         output.println "],"
         output.print "\t\t\tassets:["
         if(translation.assets)
@@ -239,6 +242,9 @@ class Writer {
         output.print "\t\t\tsystems:["
         if(translation.systems)
         output.print "\"${translation.systems.join("\",\"")}\""
+        output.println "],"
+        if(translation.active)
+        output.print "\"${translation.active.join("\",\"")}\""
         output.println "]"
         output.println "\t\t)"
         output.println "\t}"
@@ -311,6 +317,14 @@ class Writer {
             }
             output.print ")()"
         }
+        else if(call.entity) {
+            output.print "$call.entity("
+            if(call.size() > 1){
+                call = call - [entity:call.entity]
+                writeMap(call)
+            }
+            output.print ")()"
+        }
         else if(call.make) {
             output.print "${call.make.getSimpleName()}("
             if(call.size() > 1){
@@ -349,6 +363,6 @@ class Writer {
                 output.println "import pack.${it}.assets.*"
                 output.println "import pack.${it}.components.*"
                 output.println "import pack.${it}.entities.*"
-        })
+            })
     }
 }

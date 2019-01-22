@@ -10,7 +10,8 @@ class Core extends Pack {
 			assets:[],
 			components:["PositionComponent","VelocityComponent","FollowMouseComponent"],
 			entities:[],
-			systems:["MovementSystem","FollowMouseSystem","RenderSystem"]
+			systems:["MovementSystem","FollowMouseSystem","RenderSystem"],
+]
 		)
 	}
 }

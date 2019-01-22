@@ -1,9 +1,8 @@
 pack "core"
 asset RandomInteger {
-	given min:int, max:int
-	defaults min:0, max:10
+	given min:int, max:int, rand:Random
+	defaults min:0, max:10, rand:[ make : Random]
 	run {
-		Random rand = new Random()
 		return rand.nextInt(max-min) + min
 	}
 }

@@ -1,5 +1,5 @@
 pack "agar"
 component MassComponent {
-	fields mass:int
-	defaults mass:12
+	fields amount:int
+	defaults amount:5
 }

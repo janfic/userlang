@@ -1,8 +1,0 @@
-pack "agar"
-entity VirusEntity {
-	components 	"PositionComponent",
-				"CircleComponent",
-				"MassComponent",
-				"PopComponent"
-	defaults MassComponent:[mass:100]
-}

@@ -8,10 +8,10 @@ import com.badlogic.gdx.files.*
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.graphics.*
 
-class MassComponent implements Component {
-	int amount
+class NameComponent implements Component {
+	String name
 
-	MassComponent() {
-		amount = 5
+	NameComponent() {
+		name = "Pineapple"
 	}
 }

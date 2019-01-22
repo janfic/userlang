@@ -10,7 +10,8 @@ class Agar extends Pack {
 			assets:[],
 			components:["MassComponent","NameComponent","CircleComponent","PopComponent"],
 			entities:[],
-			systems:["MassSystem","CollisionSystem"]
+			systems:["MassSystem","CollisionSystem"],
+]
 		)
 	}
 }

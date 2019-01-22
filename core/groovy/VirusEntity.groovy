@@ -10,21 +10,18 @@ import com.badlogic.gdx.files.*
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.graphics.*
 
-class AgarEntity extends Closure<Entity> {
+class VirusEntity extends Closure<Entity> {
 	@Override
 	Entity call() {
 		Entity entity = new Entity()
 		entity.add(new PositionComponent())
-		entity.add(new VelocityComponent())
-		entity.add(new MassComponent())
 		entity.add(new CircleComponent())
-		entity.add(new FollowMouseComponent())
-		entity.add(new NameComponent())
-		entity.add(new ColorComponent())
+		entity.add(new MassComponent(mass:100))
+		entity.add(new PopComponent())
 		return entity
 	}
 
-	AgarEntity() {
+	VirusEntity() {
 		super(null)
 	}
 }

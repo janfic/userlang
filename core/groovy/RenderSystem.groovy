@@ -3,6 +3,7 @@ package pack.agar.systems
 import pack.agar.components.*
 import pack.agar.assets.*
 
+
 import com.badlogic.ashley.core.*
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.files.*
@@ -10,7 +11,7 @@ import com.badlogic.gdx.math.*
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutil.*
 
-class RenderSystem extends EntitySytem {
+class RenderSystem extends EntitySystem {
 	private ImmutableArray<Entity> entities
 
 	private ComponentMapper<PositionComponent> positioncomponentMapper = ComponentMapper.getFor(PositionComponent.class)
@@ -32,11 +33,11 @@ class RenderSystem extends EntitySytem {
 	}
 
 	void update(float deltaTime) {
-		sr.begin(ShapeRenderer.ShapeType.Line)
+					sr.begin(ShapeRenderer.ShapeType.Line)
 		for( entity in entities) {
 			PositionComponent position = positioncomponentMapper.get(entity)
 			CircleComponent circle = circlecomponentMapper.get(entity)
-			sr.circle(position.x, position.y, circle.radius)
+						sr.circle(position.x, position.y, circle.radius)
 		}
 		sr.end()
 	}

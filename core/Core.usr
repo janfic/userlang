@@ -1,5 +1,4 @@
 pack Core {
-
 	author 	"Jan"
 	display "CORE"
 	info	"The core engine of the game"
