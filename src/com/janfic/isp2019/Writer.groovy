@@ -48,21 +48,21 @@ class Writer {
      *  Writes a component defintion based on the translation given to it
      */
     public static void writeComponent(Map translation) {
-        output.println "package pack.${translation.pack}.components" // package writing
+        output.println "package pack.${translation.pack}.components" // set the current package
         output.println ""
-        output.println "import pack.${translation.pack}.assets.*"
+        output.println "import pack.${translation.pack}.assets.*" //import assets in current pack
         output.println ""
-        output.println "import com.badlogic.ashley.core.*" // imports 
+        output.println "import com.badlogic.ashley.core.*" // imports for commpn libgdx classes
         output.println "import com.badlogic.gdx.graphics.g2d.*"  
         output.println "import com.badlogic.gdx.files.*"
         output.println "import com.badlogic.gdx.math.*"
         output.println "import com.badlogic.gdx.graphics.*" 
         output.println ""
         output.println "class $translation.name implements Component {" // start of class
-        writeFields(translation.fields)
+        writeFields(translation.fields) //write fields
         output.println ""
         output.println "\t$translation.name() {" // constructor
-        writeDefaults(translation.defaults)
+        writeDefaults(translation.defaults) // write initializers
         output.println "\t}"
         output.print "}" // end class
     }
@@ -71,39 +71,42 @@ class Writer {
      *   Writes an Entity Definition based on the translation given to it
      */
     public static void writeEntity(Map translation) {
-        output.println "package pack.${translation.pack}.entities"
+        output.println "package pack.${translation.pack}.entities" // write current pack
         output.println ""
-        output.println "import pack.${translation.pack}.assets.*"
+        output.println "import pack.${translation.pack}.assets.*" // import assets and components in current pack
         output.println "import pack.${translation.pack}.components.*"
         output.println ""
-        writeUses(translation.uses)
+        writeUses(translation.uses) // write imports for dependencies of this entity
         output.println ""
-        output.println "import com.badlogic.ashley.core.*" // imports 
+        output.println "import com.badlogic.ashley.core.*" // imports for common libgdx tools
         output.println "import com.badlogic.gdx.graphics.g2d.*"  
         output.println "import com.badlogic.gdx.files.*"
         output.println "import com.badlogic.gdx.math.*"
         output.println "import com.badlogic.gdx.graphics.*" 
         output.println ""
-        output.println "class $translation.name extends Closure<Entity> {"
+        output.println "class $translation.name extends Closure<Entity> {" //class start
         output.println "\t@Override"
         output.println "\tEntity call() {"
-        output.println "\t\tEntity entity = new Entity()"
-        writeComponents(translation.components, translation.defaults)
-        output.println "\t\treturn entity"
+        output.println "\t\tEntity entity = new Entity()" // make new empty entity
+        writeComponents(translation.components, translation.defaults) // write add components to new entity
+        output.println "\t\treturn entity" // return new entity
         output.println "\t}"
         output.println ""
-        output.println "\t$translation.name() {"
+        output.println "\t$translation.name() {" //constructor for this closure
         output.println "\t\tsuper(null)"
         output.println "\t}"
         output.println "}"
     }
     
+    /**
+     *  Writes the list of components to add to entity during initialization
+     */
     public static void writeComponents(String[] comps, Map defaults = [:]) {
         comps.each({
-                output.print "\t\tentity.add(new $it("
-                if(defaults) {
-                    Map d = defaults[it.toString()]
-                    if(d!=null) {
+                output.print "\t\tentity.add(new $it(" // make new component
+                if(defaults) { // add defaults if they are there
+                    Map d = defaults[it.toString()] 
+                    if(d != null) {
                         writeMap(d)
                     }
                 }
@@ -115,46 +118,46 @@ class Writer {
      *   Writes a System Definition based on the translation given to it
      */
     public static void writeSystem(Map translation) {
-        output.println "package pack.${translation.pack}.systems"
+        output.println "package pack.${translation.pack}.systems" // writes pack
         output.println ""
-        output.println "import pack.${translation.pack}.components.*"
-        output.println "import pack.${translation.pack}.assets.*"
+        output.println "import pack.${translation.pack}.components.*" //imports
+        output.println "import pack.${translation.pack}.assets.*" 
+        output.println "import pack.${translation.pack}.entities.*"
         output.println ""
-        writeUses(translation.uses as String[])
+        writeUses(translation.uses as String[]) //imports dependencies
         output.println ""
-        output.println "import com.badlogic.ashley.core.*"
+        output.println "import com.badlogic.ashley.core.*" //import libgdx tools
         output.println "import com.badlogic.gdx.graphics.g2d.*"  
         output.println "import com.badlogic.gdx.files.*"
         output.println "import com.badlogic.gdx.math.*"
         output.println "import com.badlogic.gdx.graphics.*" 
         output.println "import com.badlogic.gdx.graphics.glutil.*" 
         output.println ""
-        output.println "class $translation.name extends EntitySystem {"
-        for(family in (translation.families as Map)) {
+        output.println "class $translation.name extends EntitySystem {" // start class
+        for(family in (translation.families as Map)) { // writes each family as a field
             output.println "\tprivate ImmutableArray<Entity> $family.key"
         }
         output.println ""
-        //
+        // makes one list of unique components 
         List components = []
         translation.families.each({
                 components += it.value.collect({key, value -> value})
             })
         components.unique({a , b -> a <=> b})
-        println components
-        components.each({output.println "\tprivate ComponentMapper<$it> ${it.toLowerCase()}Mapper = ComponentMapper.getFor(${it}.class)"})
+        components.each({output.println "\tprivate ComponentMapper<$it> ${it.toLowerCase()}Mapper = ComponentMapper.getFor(${it}.class)"}) // makes component apper fields
         //
         output.println ""
-        writeFields(translation.fields)
+        writeFields(translation.fields) // writes fields of the system
         output.println ""
-        output.println "\t$translation.name() {"
-        writeDefaults(translation.defaults)
+        output.println "\t$translation.name() {" // constructor
+        writeDefaults(translation.defaults) // defaults writen for fields
         output.println "\t}"
         output.println ""
-        output.println "\tvoid addedToEngine(Engine engine) {"
-        for(family in (translation.families as Map)) {
+        output.println "\tvoid addedToEngine(Engine engine) {" // when the system is added to engine it must make the families/array of entities
+        for(family in (translation.families as Map)) { // makes each family
             output.println "\t\t$family.key = engine.getFor("
             output.println "\t\t\tFamily.all("
-            (family.value as Map).eachWithIndex({ key, value, index ->
+            (family.value as Map).eachWithIndex({ key, value, index -> //iterates through each component of each family
                     output.print "\t\t\t\t${value}.class"
                     if(index < family.value.size() - 1) {
                         output.println ","
@@ -168,10 +171,10 @@ class Writer {
         }
         output.println "\t}"
         output.println ""
-        output.println "\tvoid update(float deltaTime) {"
-        if(translation.eachFrame)
-        writeBody("\t\t$translation.eachFrame")
-        for(family in translation.eachEntity) {
+        output.println "\tvoid update(float deltaTime) {" //per frame update method
+        if(translation.eachFrame) // if the translation has a frame body
+            writeBody("\t\t$translation.eachFrame")
+        for(family in translation.eachEntity) { // writes each body of eachEntity family:{}
             output.println "\t\tfor( entity in $family.key) {"
             for(c in translation.families."$family.key") {
                 output.println "\t\t\t$c.value $c.key = ${c.value.toLowerCase()}Mapper.get(entity)"
@@ -179,14 +182,14 @@ class Writer {
             writeBody("\t\t\t$family.value")
             output.println "\t\t}"
         }
-        if(translation.endFrame)
-        output.println "\t\t$translation.endFrame"
+        if(translation.endFrame) // if the translation has an end frame body
+            writeBody("\t\t$translation.endFrame")
         output.println "\t}"
         output.println "}"
     }
     
     /**  
-     *  Writes a Body of a System or Asset. Replaces all asset calls with translation 
+     *  Writes a Body of a System or Asset. Replaces all asset calls with its translation 
      */
     public static void writeBody(String body) {
         output.print "\t\t\t"
